@@ -25,6 +25,7 @@ class LiveChart extends Component {
       }
       dataToChart.splice(0, 1);
       dataToChart.splice(19, 0, e.price);
+      return true;
     });
     this.setState({
       data: {
