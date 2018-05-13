@@ -4,6 +4,7 @@ import "./App.css";
 import Converter from "./Converter";
 import Calc from "./Calc";
 import Chart from "./Chart";
+import LiveChart from "./LiveChart";
 
 class App extends Component {
   render() {
@@ -15,6 +16,7 @@ class App extends Component {
         <Converter />
         <Calc />
         <Chart />
+        <LiveChart />
       </div>
     );
   }
