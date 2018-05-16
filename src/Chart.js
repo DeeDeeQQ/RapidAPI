@@ -8,6 +8,7 @@ const onSubmit = async values => {};
 
 class Chart extends Component {
   state = {
+    label: undefined,
     data: undefined
   };
 
@@ -48,32 +49,8 @@ class Chart extends Component {
           return (high + low) / 2;
         });
         this.setState({
-          data: {
-            labels: times,
-            datasets: [
-              {
-                label: "BTC",
-                fill: true,
-                lineTension: 0.05,
-                backgroundColor: "rgba(75,192,192,0.4)",
-                borderColor: "rgba(75,192,192,1)",
-                borderCapStyle: "butt",
-                borderDash: [],
-                borderDashOffset: 0.0,
-                borderJoinStyle: "miter",
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
-                pointBorderWidth: 3,
-                pointHoverRadius: 8,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
-                pointHoverBorderWidth: 2,
-                pointRadius: 1,
-                pointHitRadius: 10,
-                data: data
-              }
-            ]
-          }
+          label: times,
+          data: data
         });
       })
       .catch(e => {
@@ -103,7 +80,32 @@ class Chart extends Component {
                 <Line
                   width={90}
                   height={30}
-                  data={this.state.data}
+                  data={{
+                    labels: this.state.label,
+                    datasets: [
+                      {
+                        label: "BTC",
+                        fill: true,
+                        lineTension: 0.05,
+                        backgroundColor: "rgba(75,192,192,0.4)",
+                        borderColor: "rgba(75,192,192,1)",
+                        borderCapStyle: "butt",
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: "miter",
+                        pointBorderColor: "rgba(75,192,192,1)",
+                        pointBackgroundColor: "#fff",
+                        pointBorderWidth: 3,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                        pointHoverBorderColor: "rgba(220,220,220,1)",
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 1,
+                        pointHitRadius: 10,
+                        data: this.state.data
+                      }
+                    ]
+                  }}
                   options={{
                     position: "right",
                     maintainAspectRatio: true

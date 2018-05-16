@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Form, Field } from "react-final-form";
 import { OnChange } from "react-final-form-listeners";
 import axios from "axios";
+import styled from "react-emotion";
 
 const onSubmit = async values => {
   // Дима, это костыль или норм так оставить если мне не нужен onSubmit()?
@@ -9,17 +10,15 @@ const onSubmit = async values => {
 
 class Converter extends Component {
   state = {
+    currency: "UAH",
     apiData: undefined
   };
-  getData(currency = "UAH") {
-    let request =
-      "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,EOS,BCH,ZIL&tsyms=" +
-      currency;
-    return axios.get(request);
-  }
-
-  componentDidMount(value) {
-    this.getData(value)
+  getData() {
+    return axios
+      .get(
+        "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,EOS,BCH,ZIL&tsyms=" +
+          this.state.currency
+      )
       .then(apiData => {
         this.setState({
           apiData: apiData.data
@@ -30,12 +29,21 @@ class Converter extends Component {
       });
   }
 
+  componentDidMount() {
+    this.getData();
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.currency !== this.state.currency) {
+      this.getData();
+    }
+  }
+
   render() {
     return (
       <Form
         onSubmit={onSubmit}
         render={({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
+          <Forma onSubmit={handleSubmit}>
             <div>
               <Field name="currency" component="select">
                 <option value="UAH">UAH</option> {/* UAH - just for myself*/}
@@ -45,19 +53,24 @@ class Converter extends Component {
               </Field>
               <OnChange name="currency">
                 {value => {
-                  this.componentDidMount(value);
+                  this.setState({
+                    currency: value
+                  });
                 }}
               </OnChange>
             </div>
-            <div>
+            <Div>
               {this.state.apiData &&
                 Object.entries(this.state.apiData).map(([key, test]) => (
-                  <div key={key}>
-                    {key} => {Object.values(test)} {Object.keys(test)}
-                  </div>
+                  <DivWithData key={key}>
+                    <span>{key}</span>
+                    <span>
+                      {Object.values(test)} {Object.keys(test)}
+                    </span>
+                  </DivWithData>
                 ))}
-            </div>
-          </form>
+            </Div>
+          </Forma>
         )}
       />
     );
@@ -65,3 +78,28 @@ class Converter extends Component {
 }
 
 export default Converter;
+
+const Forma = styled("form")`
+  margin: 50px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  & > div {
+    width: 100%;
+  }
+  & > div > select {
+    margin-bottom: 15px;
+    width: 50%;
+  }
+`;
+
+const Div = styled("div")`
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+`;
+
+const DivWithData = styled("div")`
+  display: flex;
+  flex-direction: column;
+`;
