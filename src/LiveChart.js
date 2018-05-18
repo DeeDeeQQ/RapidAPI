@@ -1,41 +1,40 @@
 import React, { Component } from "react";
 import { Line } from "react-chartjs-2";
 import Websocket from "react-websocket";
+import styled from "react-emotion";
 
-let dataToChart = [];
-let timeToChart = [];
+let dataToChart = new Array(20);
+let timeToChart = new Array(20);
 
 class LiveChart extends Component {
   state = {
     label: undefined,
-    data: undefined
+    data: undefined,
+    lastMs: Date.now()
   };
 
   handleData(data) {
     let result = JSON.parse(data);
-    let encodedTime = new Date(result.timestampms).toLocaleTimeString();
-    let encodedData = result.events[0].price;
 
-    if (timeToChart.length < 20 && dataToChart.length < 20) {
-      timeToChart.push(encodedTime);
-      dataToChart.push(encodedData);
-    } else {
+    if (result.timestampms - this.state.lastMs > 3000 || !dataToChart[0]) {
+      let encodedTime = new Date(result.timestampms).toLocaleTimeString();
+      let encodedData = result.events[0].price;
       timeToChart.splice(0, 1);
       timeToChart.splice(19, 0, encodedTime);
       dataToChart.splice(0, 1);
       dataToChart.splice(19, 0, encodedData);
-    }
-    if ((timeToChart.length = dataToChart.length = 20)) {
+
       this.setState({
         label: [...timeToChart],
-        data: [...dataToChart]
+        data: [...dataToChart],
+        lastMs: result.timestampms
       });
     }
   }
 
   render() {
     return (
-      <div>
+      <Div>
         <Websocket
           url="wss://api.gemini.com/v1/marketdata/btcusd"
           onMessage={this.handleData.bind(this)}
@@ -76,9 +75,14 @@ class LiveChart extends Component {
             }}
           />
         )}
-      </div>
+      </Div>
     );
   }
 }
 
 export default LiveChart;
+
+const Div = styled("div")`
+  width: 80%;
+  margin: auto;
+`;

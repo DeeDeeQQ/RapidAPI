@@ -3,18 +3,20 @@ import { Line } from "react-chartjs-2";
 import axios from "axios/index";
 import { Form, Field } from "react-final-form";
 import { OnChange } from "react-final-form-listeners";
+import styled from "react-emotion";
 
 const onSubmit = async values => {};
 
 class Chart extends Component {
   state = {
     label: undefined,
-    data: undefined
+    data: undefined,
+    time: "DAY"
   };
 
-  getData(time) {
+  getData() {
     let request = "";
-    switch (time) {
+    switch (this.state.time) {
       case "DAY":
         request =
           "https://min-api.cryptocompare.com/data/histohour?fsym=BTC&tsym=USD&limit=24";
@@ -30,16 +32,13 @@ class Chart extends Component {
       default:
         console.log("Something goes wrong");
     }
-    return axios.get(request);
-  }
-
-  componentDidMount(timeRatio = "DAY") {
-    this.getData(timeRatio)
+    axios
+      .get(request)
       .then(apiData => {
         let times = [];
         let data = apiData.data.Data.map(({ time, close, high, low, open }) => {
           let encodedTime = "";
-          if (timeRatio === "DAY") {
+          if (this.state.time === "DAY") {
             encodedTime = new Date(time * 1000).toLocaleTimeString();
             times.push(encodedTime);
           } else {
@@ -57,12 +56,22 @@ class Chart extends Component {
         console.log(e);
       });
   }
+
+  componentDidMount() {
+    this.getData();
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.time !== this.state.time) {
+      this.getData();
+    }
+  }
+
   render() {
     return (
       <Form
         onSubmit={onSubmit}
         render={({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
+          <Forma onSubmit={handleSubmit}>
             <div>
               <Field name="time" component="select">
                 <option value="DAY">DAY</option>
@@ -71,7 +80,9 @@ class Chart extends Component {
               </Field>
               <OnChange name="time">
                 {time => {
-                  this.componentDidMount(time);
+                  this.setState({
+                    time: time
+                  });
                 }}
               </OnChange>
             </div>
@@ -113,7 +124,7 @@ class Chart extends Component {
                 />
               )}
             </div>
-          </form>
+          </Forma>
         )}
       />
     );
@@ -121,3 +132,17 @@ class Chart extends Component {
 }
 
 export default Chart;
+
+const Forma = styled("form")`
+  margin: 50px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  & > div {
+    width: 80%;
+  }
+  & > div > select {
+    margin-bottom: 15px;
+    width: 50%;
+  }
+`;

@@ -94,6 +94,7 @@ const Forma = styled("form")`
 `;
 
 const Div = styled("div")`
+margin-top 20px;
   display: flex;
   justify-content: space-around;
   width: 100%;

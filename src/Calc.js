@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Form, Field } from "react-final-form";
 import { OnChange } from "react-final-form-listeners";
 import axios from "axios";
-import styled from "react-emotion";
+import styled, { css } from "react-emotion";
 
 const onSubmit = value => {};
 
@@ -30,7 +30,9 @@ class Calc extends Component {
     cryptCurrency: "BTC",
     currency: "UAH",
     reverse: false,
-    apiData: undefined
+    apiData: undefined,
+    orderLeft: 2,
+    orderRight: 4
   };
 
   getData = () => {
@@ -73,7 +75,10 @@ class Calc extends Component {
         onSubmit={onSubmit}
         render={({ handleSubmit }) => (
           <Forma onSubmit={handleSubmit}>
-            <SelectDiv>
+            <SelectDiv
+              orderLeft={this.state.orderLeft}
+              orderRight={this.state.orderRight}
+            >
               <Field
                 name="quantity"
                 component={Input}
@@ -108,7 +113,15 @@ class Calc extends Component {
               <button
                 type="button"
                 onClick={() => {
+                  let right = 4;
+                  let left = 2;
+                  if (this.state.orderRight === 2) {
+                    right = 2;
+                    left = 4;
+                  }
                   this.setState({
+                    orderLeft: right,
+                    orderRight: left,
                     reverse: !this.state.reverse
                   });
                 }}
@@ -117,7 +130,6 @@ class Calc extends Component {
               </button>
               <Field
                 name="currency"
-                order={4}
                 component={Select}
                 options={[
                   { key: "UAH", show: "UAH" },
@@ -134,21 +146,23 @@ class Calc extends Component {
                 }}
               </OnChange>
             </SelectDiv>
-            <div id="result-left">
-              {(!this.state.reverse &&
-                `${this.state.quantity} ${this.state.cryptCurrency}`) ||
-                `${this.state.quantity} ${this.state.currency}`}
-            </div>
-            <div id="result-center">=</div>
-            <div id="result-right">
-              {(!this.state.reverse &&
-                `${this.state.apiData * this.state.quantity} ${
-                  this.state.currency
-                }`) ||
-                `${this.state.quantity / this.state.apiData} ${
-                  this.state.cryptCurrency
-                }`}
-            </div>
+            <OutputDiv>
+              <div id="result-left">
+                {(!this.state.reverse &&
+                  `${this.state.quantity} ${this.state.cryptCurrency}`) ||
+                  `${this.state.quantity} ${this.state.currency}`}
+              </div>
+              <div id="result-center">=</div>
+              <div id="result-right">
+                {(!this.state.reverse &&
+                  `${this.state.apiData * this.state.quantity} ${
+                    this.state.currency
+                  }`) ||
+                  `${this.state.quantity / this.state.apiData} ${
+                    this.state.cryptCurrency
+                  }`}
+              </div>
+            </OutputDiv>
           </Forma>
         )}
       />
@@ -166,6 +180,16 @@ const Forma = styled("form")`
   flex-direction: column;
   align-items: center;
 `;
+
+const dynamicRight = props =>
+  css`
+    order: ${props.orderRight};
+  `;
+
+const dynamicLeft = props =>
+  css`
+    order: ${props.orderLeft};
+  `;
 
 const SelectDiv = styled("div")`
   margin: 40px;
@@ -186,12 +210,27 @@ const SelectDiv = styled("div")`
     order: 1;
   }
   & :nth-child(2) {
-    order: 3;
+    & :nth-child(1) {
+      width: 70px;
+      height: 22px;
+    }
+    ${dynamicRight};
   }
   & :nth-child(3) {
     order: 3;
   }
   & :nth-child(4) {
-    order: 4;
+    & :nth-child(1) {
+      width: 70px;
+      height: 22px;
+    }
+    ${dynamicLeft};
   }
+`;
+
+const OutputDiv = styled("div")`
+  margin-bottom: 40px;
+  display: flex;
+  width: 60%;
+  justify-content: space-around;
 `;
