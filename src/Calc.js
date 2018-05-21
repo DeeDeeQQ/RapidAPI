@@ -31,8 +31,8 @@ class Calc extends Component {
     currency: "UAH",
     reverse: false,
     apiData: undefined,
-    orderLeft: 2,
-    orderRight: 4
+    orderLeft: 4,
+    orderRight: 2
   };
 
   getData = () => {

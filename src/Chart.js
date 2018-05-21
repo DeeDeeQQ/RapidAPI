@@ -11,32 +11,16 @@ class Chart extends Component {
   state = {
     label: undefined,
     data: undefined,
-    time: "DAY"
+    time: "hour?fsym=BTC&tsym=USD&limit=24"
   };
 
-  getData() {
-    let request = "";
-    switch (this.state.time) {
-      case "DAY":
-        request =
-          "https://min-api.cryptocompare.com/data/histohour?fsym=BTC&tsym=USD&limit=24";
-        break;
-      case "MOUNTH":
-        request =
-          "https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=31";
-        break;
-      case "YEAR":
-        request =
-          "https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=12&aggregate=30";
-        break;
-      default:
-        console.log("Something goes wrong");
-    }
+  getData(time) {
+    let requestBase = "https://min-api.cryptocompare.com/data/histo";
     axios
-      .get(request)
+      .get(requestBase + time)
       .then(apiData => {
         let times = [];
-        let data = apiData.data.Data.map(({ time, close, high, low, open }) => {
+        let data = apiData.data.Data.map(({ time, close, high, low }) => {
           let encodedTime = "";
           if (this.state.time === "DAY") {
             encodedTime = new Date(time * 1000).toLocaleTimeString();
@@ -58,11 +42,11 @@ class Chart extends Component {
   }
 
   componentDidMount() {
-    this.getData();
+    this.getData(this.state.time);
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevState.time !== this.state.time) {
-      this.getData();
+      this.getData(this.state.time);
     }
   }
 
@@ -74,9 +58,11 @@ class Chart extends Component {
           <Forma onSubmit={handleSubmit}>
             <div>
               <Field name="time" component="select">
-                <option value="DAY">DAY</option>
-                <option value="MOUNTH">MOUNTH</option>
-                <option value="YEAR">YEAR</option>
+                <option value="hour?fsym=BTC&tsym=USD&limit=24">DAY</option>
+                <option value="day?fsym=BTC&tsym=USD&limit=31">MOUNTH</option>
+                <option value="day?fsym=BTC&tsym=USD&limit=12&aggregate=30">
+                  YEAR
+                </option>
               </Field>
               <OnChange name="time">
                 {time => {
